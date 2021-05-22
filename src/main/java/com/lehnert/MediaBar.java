@@ -16,13 +16,11 @@ import javafx.scene.media.MediaPlayer.Status;
 import java.io.File;
 
 public class MediaBar extends HBox {
-
-
-    Slider time = new Slider();
-    Slider vol = new Slider();
-    Button PlayButton = new Button("||");
-    Label volume = new Label("Volume: ");
-    MediaPlayer player;
+    private Slider time = new Slider();
+    private Slider vol = new Slider();
+    private Button PlayButton = new Button("||");
+    private Label volume = new Label("Volume: ");
+    private MediaPlayer player;
 
     public MediaBar(MediaPlayer play) {
         this.player = play;
@@ -34,8 +32,6 @@ public class MediaBar extends HBox {
         vol.setValue(100);
         HBox.setHgrow(time, Priority.ALWAYS);
         PlayButton.setPrefWidth(30);
-
-
 
         getChildren().add(PlayButton);
         getChildren().add(time);
