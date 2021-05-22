@@ -35,7 +35,6 @@ public class App extends Application {
         }
     }
 
-
     public void start(Stage primaryStage) {
         // get file from a user
         FileChooser fileChooser = new FileChooser();
@@ -68,7 +67,7 @@ public class App extends Application {
 
                 if (extension.equals("mp3") || extension.equals("wav")) {
                     // got music there
-                    Label musicTitle = new Label("Music - " + extension);
+                    Label musicTitle = new Label("Audio - " + extension);
                     musicTitle.setPadding(new Insets(5, 10, 5, 10));
 
                     musicTitle.setMaxWidth(Double.MAX_VALUE);
