@@ -1,34 +1,47 @@
 package com.lehnert;
 
-import javafx.event.Event;
 import javafx.scene.control.*;
 
+import java.time.Year;
+
 public class MenuBar extends javafx.scene.control.MenuBar {
+    // help
+    private final MenuItem about = new MenuItem("About");
+   // file
+    private final MenuItem open = new MenuItem("Open");
+
    public MenuBar() {
        // Help Menu
        Menu help = new Menu("Help");
 
-       // Help items
-       MenuItem about = new MenuItem("About");
        help.getItems().add(about);
 
-       about.setOnAction(this::setAboutScene);
+       // File Menu
+       Menu file = new Menu("File");
 
+       file.getItems().add(open);
 
        // add all menus
+       this.getMenus().add(file);
        this.getMenus().add(help);
    }
 
-   private void setAboutScene(Event e) {
-       Dialog<String> dialog = new Dialog<>();
+   public void setOnOpen(Runnable r) {
+       open.setOnAction((e) -> r.run());
+   }
 
-       dialog.setTitle("About");
-       dialog.setContentText("Created by Christian Lehnert (C) 2021");
+   public void setOnAbout(String author) {
+       about.setOnAction(e -> {
+           Dialog<String> dialog = new Dialog<>();
 
-       ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+           dialog.setTitle("About");
+           dialog.setContentText(String.format("Created by %s (C) %s", author, Year.now()));
 
-       dialog.getDialogPane().getButtonTypes().add(type);
+           ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
 
-       dialog.showAndWait();
+           dialog.getDialogPane().getButtonTypes().add(type);
+
+           dialog.showAndWait();
+       });
    }
 }

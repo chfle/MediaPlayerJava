@@ -17,7 +17,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.Locale;
 import java.util.Objects;
 
 public class App extends Application {
@@ -34,7 +33,6 @@ public class App extends Application {
             return null;
         }
     }
-
 
     public void start(Stage primaryStage) {
         // get file from a user
@@ -68,7 +66,7 @@ public class App extends Application {
 
                 if (extension.equals("mp3") || extension.equals("wav")) {
                     // got music there
-                    Label musicTitle = new Label("Music - " + extension);
+                    Label musicTitle = new Label("Audio - " + extension);
                     musicTitle.setPadding(new Insets(5, 10, 5, 10));
 
                     musicTitle.setMaxWidth(Double.MAX_VALUE);
@@ -76,6 +74,7 @@ public class App extends Application {
 
                     box.getChildren().add(musicTitle);
                     box.getChildren().add(musicBar);
+
 
                     // Music Scene
                     scene = new Scene(new Pane(box), 300, 100);
