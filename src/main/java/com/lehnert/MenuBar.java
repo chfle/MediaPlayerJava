@@ -8,7 +8,8 @@ public class MenuBar extends javafx.scene.control.MenuBar {
     // help
     private final MenuItem about = new MenuItem("About");
    // file
-    private final MenuItem open = new MenuItem("Open");
+    private final MenuItem open = new MenuItem("Open File...");
+    private final MenuItem close = new MenuItem("Close Window");
 
    public MenuBar() {
        // Help Menu
@@ -20,6 +21,8 @@ public class MenuBar extends javafx.scene.control.MenuBar {
        Menu file = new Menu("File");
 
        file.getItems().add(open);
+       file.getItems().add(new SeparatorMenuItem());
+       file.getItems().add(close);
 
        // add all menus
        this.getMenus().add(file);
@@ -28,6 +31,10 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
    public void setOnOpen(Runnable r) {
        open.setOnAction((e) -> r.run());
+   }
+
+   public void setOnClose(Runnable r) {
+       close.setOnAction((e) -> r.run());
    }
 
    public void setOnAbout(String author) {
