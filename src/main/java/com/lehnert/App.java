@@ -17,7 +17,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.Locale;
 import java.util.Objects;
 
 public class App extends Application {
@@ -35,7 +34,10 @@ public class App extends Application {
         }
     }
 
-    public void start(Stage primaryStage) {
+    /** Opens a FileChooser to choose something to play
+     *
+     */
+    private File getFile(Stage primaryStage) {
         // get file from a user
         FileChooser fileChooser = new FileChooser();
 
@@ -47,71 +49,104 @@ public class App extends Application {
                 new FileChooser.ExtensionFilter("MP4", "*.mp4")
         );
 
-        File file = fileChooser.showOpenDialog(primaryStage);
+        return fileChooser.showOpenDialog(primaryStage);
+    }
 
-        try {
-            Media media = new Media(file.toURI().toURL().toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(media);
-            VBox box = new VBox();
+    private boolean playerRunning = false;
+    private MediaPlayer mediaPlayer = null;
 
-            MediaView mediaView = new MediaView(mediaPlayer);
-            MediaBar mediaBar = new MediaBar(mediaPlayer);
-            MusicBar musicBar = new MusicBar(mediaPlayer);
-            MenuBar menuBar = new MenuBar();
+    public void start(Stage primaryStage) {
+        MenuBar menuBar = new MenuBar();
+        Runnable player = () -> {
+            // ask user for a file
+            File file = getFile(primaryStage);
 
-            mediaPlayer.setOnReady (()-> {
-                // check if the media is music or video
-                String extension = Objects.requireNonNull(getFileExtension(file.toString())).toLowerCase();
-                box.getChildren().add(menuBar);
-                Scene scene = null;
+            // check if a player is running
+            if (playerRunning) {
+                mediaPlayer.stop();
+                mediaPlayer.dispose();
 
-                if (extension.equals("mp3") || extension.equals("wav")) {
-                    // got music there
-                    Label musicTitle = new Label("Audio - " + extension);
-                    musicTitle.setPadding(new Insets(5, 10, 5, 10));
+                playerRunning = false;
+            }
 
-                    musicTitle.setMaxWidth(Double.MAX_VALUE);
-                    musicTitle.setAlignment(Pos.CENTER);
+            try {
 
-                    box.getChildren().add(musicTitle);
-                    box.getChildren().add(musicBar);
+                Media media = new Media(file.toURI().toURL().toString());
+                mediaPlayer = new MediaPlayer(media);
+                VBox box = new VBox();
 
-                    // Music Scene
-                    scene = new Scene(new Pane(box), 300, 100);
-                } else {
-                    // got a video there
-                    box.getChildren().add(mediaView);
-                    box.getChildren().add(mediaBar);
+                MediaView mediaView = new MediaView(mediaPlayer);
+                MediaBar mediaBar = new MediaBar(mediaPlayer);
+                MusicBar musicBar = new MusicBar(mediaPlayer);
 
-                    scene = new Scene(new Pane(box), media.getWidth(),
-                            media.getHeight() + 70);
+                // create a player with window
+                mediaPlayer.setOnReady(() -> {
+                    // check if the media is music or video
+                    String extension = Objects.requireNonNull(getFileExtension(file.toString())).toLowerCase();
+                    box.getChildren().add(menuBar);
+                    Scene scene;
 
-                }
+                    // supported video formats
+                    if (extension.equals("mp3") || extension.equals("wav")) {
+                        // got music there
+                        Label musicTitle = new Label("Audio - " + extension);
+                        musicTitle.setPadding(new Insets(5, 10, 5, 10));
 
-                // setup window
-                primaryStage.setTitle("Media Player");
-                primaryStage.setScene(scene);
-                primaryStage.setResizable(false);
+                        musicTitle.setMaxWidth(Double.MAX_VALUE);
+                        musicTitle.setAlignment(Pos.CENTER);
+
+                        box.getChildren().add(musicTitle);
+                        box.getChildren().add(musicBar);
+
+
+                        // Music Scene
+                        scene = new Scene(new Pane(box), 300, 100);
+                    } else {
+                        // got a video there
+                        box.getChildren().add(mediaView);
+                        box.getChildren().add(mediaBar);
+
+                        scene = new Scene(new Pane(box), media.getWidth(),
+                                media.getHeight() + 70);
+
+                    }
+
+                    // media player is running
+                    playerRunning = true;
+
+                    // setup window
+                    primaryStage.setTitle("Media Player");
+                    primaryStage.setScene(scene);
+                    primaryStage.setResizable(false);
+                    primaryStage.show();
+
+                    // play the media
+                    mediaPlayer.play();
+                });
+                // create a window to notify the user for a bad url...
+            } catch (Exception ignore) {
+                Label label = new Label("Url does not Work...");
+                Button button = new Button("OK");
+                label.setTextFill(Color.BLACK);
+                label.setFont(Font.font("verdana", 15));
+                VBox box = new VBox(20, label, button);
+                box.setAlignment(Pos.CENTER);
+
+                button.setOnAction(e -> primaryStage.close());
+
+                primaryStage.setTitle("Error");
+                primaryStage.setScene(new Scene(box, 200, 100));
                 primaryStage.show();
+            }
+        };
 
-                // play the media
-                mediaPlayer.play();
-            });
-        } catch (Exception ignore) {
-            Label label = new Label("Url does not Work...");
-            Button button = new Button("OK");
-            label.setTextFill(Color.BLACK);
-            label.setFont(Font.font("verdana", 15));
-            VBox box = new VBox(20, label, button);
-            box.setAlignment(Pos.CENTER);
+        // menubar handles...
+        menuBar.setOnAbout("Christian Lehnert");
+        menuBar.setOnOpen(player);
+        menuBar.setOnClose(primaryStage::close);
 
-            button.setOnAction(e -> primaryStage.close());
-
-
-            primaryStage.setTitle("Error");
-            primaryStage.setScene(new Scene(box, 200, 100));
-            primaryStage.show();
-        }
+        // start a player
+        player.run();
 
     }
 }
