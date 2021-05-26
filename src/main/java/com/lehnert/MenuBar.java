@@ -7,6 +7,7 @@ import java.time.Year;
 public class MenuBar extends javafx.scene.control.MenuBar {
     // help
     private final MenuItem about = new MenuItem("About");
+    private final MenuItem reportBug = new MenuItem("Report bug");
    // file
     private final MenuItem open = new MenuItem("Open File...");
     private final MenuItem close = new MenuItem("Close Window");
@@ -16,6 +17,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
        Menu help = new Menu("Help");
 
        help.getItems().add(about);
+       help.getItems().add(reportBug);
 
        // File Menu
        Menu file = new Menu("File");
@@ -50,5 +52,9 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
            dialog.showAndWait();
        });
+   }
+
+   public void setOnReportBug(Runnable r) {
+       reportBug.setOnAction((e) -> r.run());
    }
 }

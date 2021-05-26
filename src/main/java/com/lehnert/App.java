@@ -4,8 +4,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
@@ -17,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.time.Year;
 import java.util.Objects;
 
 public class App extends Application {
@@ -162,6 +162,22 @@ public class App extends Application {
         menuBar.setOnAbout("Christian Lehnert");
         menuBar.setOnOpen(player);
         menuBar.setOnClose(primaryStage::close);
+        menuBar.setOnReportBug(() -> {
+            try {
+                getHostServices().showDocument("mailto:christian.lehnert.dev@gmail.com");
+            } catch (Exception ignored) {
+                Dialog<String> noClient = new Dialog<>();
+
+                noClient.setTitle("Error");
+                noClient.setContentText("No Email Client found!");
+
+                ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+
+                noClient.getDialogPane().getButtonTypes().add(type);
+
+                noClient.showAndWait();
+            }
+        });
 
         // start a player
         player.run();
