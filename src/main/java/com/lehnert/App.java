@@ -57,17 +57,34 @@ public class App extends Application {
 
     public void start(Stage primaryStage) {
         MenuBar menuBar = new MenuBar();
+        primaryStage.setTitle("Media Player");
+
         Runnable player = () -> {
             // ask user for a file
             File file = getFile(primaryStage);
 
+
             // check if a player is running
-            if (playerRunning) {
+            if (playerRunning && file != null) {
                 mediaPlayer.stop();
                 mediaPlayer.dispose();
 
                 playerRunning = false;
             }
+
+            // No file selected
+            if (file == null && !playerRunning) {
+                Label label = new Label("No file selected");
+                VBox box = new VBox(menuBar, label);
+
+                Scene scene = new Scene(box, 200, 100);
+                primaryStage.setScene(scene);
+                primaryStage.show();
+                return;
+            } else if (playerRunning) {
+                return;
+            }
+
 
             try {
 
@@ -81,6 +98,7 @@ public class App extends Application {
 
                 // create a player with window
                 mediaPlayer.setOnReady(() -> {
+
                     // check if the media is music or video
                     String extension = Objects.requireNonNull(getFileExtension(file.toString())).toLowerCase();
                     box.getChildren().add(menuBar);
