@@ -16,8 +16,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.time.Year;
 import java.util.Objects;
+import java.util.Optional;
 
 public class App extends Application {
 
@@ -52,8 +52,7 @@ public class App extends Application {
         return fileChooser.showOpenDialog(primaryStage);
     }
 
-    private boolean playerRunning = false;
-    private MediaPlayer mediaPlayer = null;
+    private Optional<MediaPlayer> mediaPlayerWrapper = Optional.empty();
 
     public void start(Stage primaryStage) {
         MenuBar menuBar = new MenuBar();
@@ -61,89 +60,96 @@ public class App extends Application {
 
         Runnable player = () -> {
             // ask user for a file
-            File file = getFile(primaryStage);
+            Optional<File> file = Optional.ofNullable(getFile(primaryStage));
 
 
             // check if a player is running
-            if (playerRunning && file != null) {
-                mediaPlayer.stop();
-                mediaPlayer.dispose();
+            if (file.isPresent()) {
+                mediaPlayerWrapper.ifPresent((mediaPlayer) -> {
+                    mediaPlayer.stop();
+                    mediaPlayer.dispose();
+                });
 
-                playerRunning = false;
+
+                mediaPlayerWrapper = Optional.empty();
             }
 
             // No file selected
-            if (file == null && !playerRunning) {
+            if (file.isEmpty() && mediaPlayerWrapper.isEmpty()) {
                 Label label = new Label("No file selected");
                 VBox box = new VBox(menuBar, label);
 
                 Scene scene = new Scene(box, 200, 100);
                 primaryStage.setScene(scene);
                 primaryStage.show();
+
                 return;
-            } else if (playerRunning) {
+            } else if (mediaPlayerWrapper.isPresent()) {
                 return;
             }
 
 
             try {
 
-                Media media = new Media(file.toURI().toURL().toString());
-                mediaPlayer = new MediaPlayer(media);
+                Media media = new Media(file.get().toURI().toURL().toString());
+                mediaPlayerWrapper = Optional.of(new MediaPlayer(media));
                 VBox box = new VBox();
 
-                MediaView mediaView = new MediaView(mediaPlayer);
-                MediaBar mediaBar = new MediaBar(mediaPlayer);
-                MusicBar musicBar = new MusicBar(mediaPlayer);
+                mediaPlayerWrapper.ifPresent((mediaPlayer) -> {
+                    MediaView mediaView = new MediaView(mediaPlayer);
+                    MediaBar mediaBar = new MediaBar(mediaPlayer);
+                    MusicBar musicBar = new MusicBar(mediaPlayer);
 
-                // create a player with window
-                mediaPlayer.setOnReady(() -> {
+                    // create a player with window
+                    mediaPlayer.setOnReady(() -> {
 
-                    // check if the media is music or video
-                    String extension = Objects.requireNonNull(getFileExtension(file.toString())).toLowerCase();
-                    box.getChildren().add(menuBar);
-                    Scene scene;
+                        // check if the media is music or video
+                        String extension = Objects.requireNonNull(getFileExtension(file.get().toString())).toLowerCase();
+                        box.getChildren().add(menuBar);
+                        Scene scene;
 
-                    // supported video formats
-                    if (extension.equals("mp3") || extension.equals("wav")) {
-                        // got music there
-                        Label musicTitle = new Label("Audio - " + extension);
-                        musicTitle.setPadding(new Insets(5, 10, 5, 10));
+                        // supported video formats
+                        if (extension.equals("mp3") || extension.equals("wav")) {
+                            // got music there
+                            Label musicTitle = new Label("Audio - " + extension);
+                            musicTitle.setPadding(new Insets(5, 10, 5, 10));
 
-                        musicTitle.setMaxWidth(Double.MAX_VALUE);
-                        musicTitle.setAlignment(Pos.CENTER);
+                            musicTitle.setMaxWidth(Double.MAX_VALUE);
+                            musicTitle.setAlignment(Pos.CENTER);
 
-                        box.getChildren().add(musicTitle);
-                        box.getChildren().add(musicBar);
+                            box.getChildren().add(musicTitle);
+                            box.getChildren().add(musicBar);
 
 
-                        // Music Scene
-                        scene = new Scene(new Pane(box), 300, 100);
-                    } else {
-                        // got a video there
-                        box.getChildren().add(mediaView);
-                        box.getChildren().add(mediaBar);
+                            // Music Scene
+                            scene = new Scene(new Pane(box), 300, 100);
+                        } else {
+                            // got a video there
+                            box.getChildren().add(mediaView);
+                            box.getChildren().add(mediaBar);
 
-                        scene = new Scene(new Pane(box), media.getWidth(),
-                                media.getHeight() + 70);
+                            scene = new Scene(new Pane(box), media.getWidth(),
+                                    media.getHeight() + 70);
 
-                    }
+                        }
 
-                    // media player is running
-                    playerRunning = true;
+                        // setup window
+                        primaryStage.setTitle("Media Player");
+                        primaryStage.setScene(scene);
+                        primaryStage.setResizable(false);
+                        primaryStage.show();
 
-                    // setup window
-                    primaryStage.setTitle("Media Player");
-                    primaryStage.setScene(scene);
-                    primaryStage.setResizable(false);
-                    primaryStage.show();
-
-                    // play the media
-                    mediaPlayer.play();
+                        // play the media
+                        mediaPlayer.play();
+                    });
                 });
+
+                if (mediaPlayerWrapper.isEmpty()) {
+                    throw new Exception("Media not working");
+                }
                 // create a window to notify the user for a bad url...
             } catch (Exception ignore) {
-                Label label = new Label("Url does not Work...");
+                Label label = new Label("Media is invalid.");
                 Button button = new Button("OK");
                 label.setTextFill(Color.BLACK);
                 label.setFont(Font.font("verdana", 15));
