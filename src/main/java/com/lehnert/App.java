@@ -1,5 +1,10 @@
 package com.lehnert;
 
+import com.lehnert.widgets.MediaBar;
+import com.lehnert.widgets.MenuBar;
+import com.lehnert.widgets.MusicBar;
+
+import com.lehnert.widgets.slider.VolumeSlider;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -55,7 +60,7 @@ public class App extends Application {
     private Optional<MediaPlayer> mediaPlayerWrapper = Optional.empty();
 
     public void start(Stage primaryStage) {
-        MenuBar menuBar = new MenuBar();
+        com.lehnert.widgets.MenuBar menuBar = new MenuBar();
         primaryStage.setTitle("Media Player");
 
         Runnable player = () -> {

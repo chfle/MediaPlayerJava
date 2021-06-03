@@ -1,4 +1,4 @@
-package com.lehnert;
+package com.lehnert.widgets;
 
 import javafx.scene.control.*;
 

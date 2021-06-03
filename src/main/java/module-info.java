@@ -5,4 +5,5 @@ module MediaPlayer {
     requires javafx.fxml;
 
     opens com.lehnert;
+    opens com.lehnert.widgets;
 }

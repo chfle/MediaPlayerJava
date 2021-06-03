@@ -1,26 +1,22 @@
-package com.lehnert;
+package com.lehnert.widgets;
 
+import com.lehnert.widgets.slider.VolumeSlider;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 
-import java.io.File;
-
 public class MediaBar extends HBox {
-    private Slider time = new Slider();
-    private Slider vol = new Slider();
-    private Button PlayButton = new Button("||");
-    private Label volume = new Label("Volume: ");
-    private MediaPlayer player;
+    private final Slider time = new Slider();
+    private final VolumeSlider vol = new VolumeSlider();
+    private final Button PlayButton = new Button("||");
+    private final MediaPlayer player;
 
     public MediaBar(MediaPlayer play) {
         this.player = play;
@@ -35,6 +31,7 @@ public class MediaBar extends HBox {
 
         getChildren().add(PlayButton);
         getChildren().add(time);
+        Label volume = new Label("Volume: ");
         getChildren().add(volume);
         getChildren().add(vol);
 
@@ -75,14 +72,10 @@ public class MediaBar extends HBox {
         });
 
 
-        vol.valueProperty().addListener(ov -> {
-            if (vol.isPressed()) {
-                player.setVolume(vol.getValue() / 100);
-            }
-        });
+        vol.setOnVolumeChanged((v) -> player.setVolume(v / 100));
     }
 
-    protected void updatesValues() {
+    private void updatesValues() {
         Platform.runLater(() -> {
             // This will move the slider while the video is running
             time.setValue(player.getCurrentTime().toMillis() /

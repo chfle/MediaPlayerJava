@@ -1,23 +1,16 @@
-package com.lehnert;
+package com.lehnert.widgets;
 
+import com.lehnert.widgets.slider.VolumeSlider;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.media.MediaPlayer;
 
 public class MusicBar extends HBox {
-    private Slider vol = new Slider();
-    private Button playButton = new Button("Start");
-    private Button stopButton = new Button("Pause");
-    private Button repeatButton = new Button("Repeat");
-    private MediaPlayer player;
-
+    private final VolumeSlider vol = new VolumeSlider();
 
     public MusicBar(MediaPlayer player) {
-        this.player = player;
 
         setAlignment(Pos.CENTER);
         setPadding(new Insets(10, 10, 5, 10));
@@ -27,8 +20,11 @@ public class MusicBar extends HBox {
         vol.setMinWidth(30);
         vol.setValue(100);
 
+        Button playButton = new Button("Start");
         playButton.setPrefWidth(60);
+        Button stopButton = new Button("Pause");
         stopButton.setPrefWidth(60);
+        Button repeatButton = new Button("Repeat");
         repeatButton.setPrefWidth(60);
 
         getChildren().add(playButton);
@@ -44,10 +40,6 @@ public class MusicBar extends HBox {
             player.play();
         });
 
-        vol.valueProperty().addListener(ov -> {
-            if (vol.isPressed()) {
-                player.setVolume(vol.getValue() / 100);
-            }
-        });
+        vol.setOnVolumeChanged((v) -> player.setVolume(v / 100));
     }
 }
