@@ -1,10 +1,10 @@
 package com.lehnert;
 
-import com.lehnert.widgets.MediaBar;
-import com.lehnert.widgets.MenuBar;
-import com.lehnert.widgets.MusicBar;
+import com.lehnert.widgets.dialog.ErrorDialog;
+import com.lehnert.widgets.mediabar.AudioBar;
+import com.lehnert.widgets.mediabar.MediaBar;
 
-import com.lehnert.widgets.slider.VolumeSlider;
+import com.lehnert.widgets.menubar.MenuBar;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -60,13 +60,21 @@ public class App extends Application {
     private Optional<MediaPlayer> mediaPlayerWrapper = Optional.empty();
 
     public void start(Stage primaryStage) {
-        com.lehnert.widgets.MenuBar menuBar = new MenuBar();
+        com.lehnert.widgets.menubar.MenuBar menuBar = new MenuBar();
         primaryStage.setTitle("Media Player");
+
+        Runnable noFile = () -> {
+            Label label = new Label("No file selected");
+            VBox box = new VBox(menuBar, label);
+
+            Scene scene = new Scene(box, 200, 100);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        };
 
         Runnable player = () -> {
             // ask user for a file
             Optional<File> file = Optional.ofNullable(getFile(primaryStage));
-
 
             // check if a player is running
             if (file.isPresent()) {
@@ -81,13 +89,7 @@ public class App extends Application {
 
             // No file selected
             if (file.isEmpty() && mediaPlayerWrapper.isEmpty()) {
-                Label label = new Label("No file selected");
-                VBox box = new VBox(menuBar, label);
-
-                Scene scene = new Scene(box, 200, 100);
-                primaryStage.setScene(scene);
-                primaryStage.show();
-
+                noFile.run();
                 return;
             } else if (mediaPlayerWrapper.isPresent()) {
                 return;
@@ -103,7 +105,7 @@ public class App extends Application {
                 mediaPlayerWrapper.ifPresent((mediaPlayer) -> {
                     MediaView mediaView = new MediaView(mediaPlayer);
                     MediaBar mediaBar = new MediaBar(mediaPlayer);
-                    MusicBar musicBar = new MusicBar(mediaPlayer);
+                    AudioBar musicBar = new AudioBar(mediaPlayer);
 
                     // create a player with window
                     mediaPlayer.setOnReady(() -> {
@@ -154,18 +156,9 @@ public class App extends Application {
                 }
                 // create a window to notify the user for a bad url...
             } catch (Exception ignore) {
-                Label label = new Label("Media is invalid.");
-                Button button = new Button("OK");
-                label.setTextFill(Color.BLACK);
-                label.setFont(Font.font("verdana", 15));
-                VBox box = new VBox(20, label, button);
-                box.setAlignment(Pos.CENTER);
+                noFile.run();
 
-                button.setOnAction(e -> primaryStage.close());
-
-                primaryStage.setTitle("Error");
-                primaryStage.setScene(new Scene(box, 200, 100));
-                primaryStage.show();
+                new ErrorDialog("Media not found");
             }
         };
 
@@ -177,16 +170,7 @@ public class App extends Application {
             try {
                 getHostServices().showDocument("mailto:christian.lehnert.dev@gmail.com");
             } catch (Exception ignored) {
-                Dialog<String> noClient = new Dialog<>();
-
-                noClient.setTitle("Error");
-                noClient.setContentText("No Email Client found!");
-
-                ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
-
-                noClient.getDialogPane().getButtonTypes().add(type);
-
-                noClient.showAndWait();
+                new ErrorDialog("No Email Client found!");
             }
         });
 

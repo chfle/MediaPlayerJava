@@ -1,4 +1,4 @@
-package com.lehnert.widgets;
+package com.lehnert.widgets.mediabar;
 
 import com.lehnert.widgets.slider.VolumeSlider;
 import javafx.application.Platform;

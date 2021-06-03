@@ -1,4 +1,4 @@
-package com.lehnert.widgets;
+package com.lehnert.widgets.mediabar;
 
 import com.lehnert.widgets.slider.VolumeSlider;
 import javafx.geometry.Insets;
@@ -7,10 +7,10 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.MediaPlayer;
 
-public class MusicBar extends HBox {
+public class AudioBar extends HBox {
     private final VolumeSlider vol = new VolumeSlider();
 
-    public MusicBar(MediaPlayer player) {
+    public AudioBar(MediaPlayer player) {
 
         setAlignment(Pos.CENTER);
         setPadding(new Insets(10, 10, 5, 10));
