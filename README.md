@@ -5,9 +5,7 @@ A Media Player created with Java and Javafx
 ## Installation 
 
 ```bash
-mvn compile
-mvn mvn package 
-```
+mvn install 
 
 ## Run
 
